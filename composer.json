@@ -1,0 +1,36 @@
+{
+  "config": {
+    "secure-http": false
+  },
+  "name": "bonnier/wp-bonnier-purchase",
+  "description": "Integrate with a purchase system",
+  "type": "wordpress-plugin",
+  "keywords": ["wordpress", "plugin"],
+  "homepage": "https://github.com/BenjaminMedia/wp-bonnier-purchase",
+  "repositories":[
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "authors": [
+    {
+      "name": "Bonnier Publications",
+      "email": "interactive@bonnier.dk",
+      "homepage": "http://bonnierpublications.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/BenjaminMedia/wp-bonnier-purchase/issues",
+    "source": "https://github.com/BenjaminMedia/wp-bonnier-purchase"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bonnier\\WP\\Purchase\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.6",
+    "guzzlehttp/guzzle": "^6.3"
+  }
+}
