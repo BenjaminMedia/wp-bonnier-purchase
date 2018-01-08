@@ -2,11 +2,9 @@
 
 namespace Bonnier\WP\Purchase\Repositories;
 
-use Bonnier\WP\OAuth\Services\AccessTokenService;
 use Bonnier\WP\OAuth\WpOAuth;
 use Bonnier\WP\Purchase\Services\PurchaseManagerService;
 use Bonnier\WP\Purchase\WpPurchase;
-use League\OAuth2\Client\Token\AccessToken;
 
 class PurchaseManagerRepository
 {
@@ -28,7 +26,7 @@ class PurchaseManagerRepository
     {
         return $this->service->hasAccess(
             $product_id,
-            AccessTokenService::getFromStorage()->getToken()
+            WpPurchase::instance()->getUserProvider()->getIdentifier()
         );
     }
 
@@ -39,7 +37,7 @@ class PurchaseManagerRepository
         }
 
         if(!$accessToken){
-            $accessToken = AccessTokenService::getFromStorage() ? AccessTokenService::getFromStorage()->getToken() : null;
+            $accessToken = WpPurchase::instance()->getUserProvider()->getIdentifier();
             if(!WpOAuth::instance()->getUserRepo()->isAuthenticated() || !$accessToken){
                 return $callbackUrl;
             }
@@ -68,7 +66,7 @@ class PurchaseManagerRepository
     public function getHistory()
     {
         return $this->service->getHistory(
-            AccessTokenService::getFromStorage()->getToken()
+            WpPurchase::instance()->getUserProvider()->getIdentifier()
         );
     }
 }

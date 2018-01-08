@@ -9,6 +9,11 @@ class CommonLoginUserProvider implements UserInterface
 {
     public function getIdentifier()
     {
-        return AccessTokenService::getFromStorage()->getToken();
+        $tokenFromStorage = AccessTokenService::getFromStorage();
+        if($tokenFromStorage) {
+            return $tokenFromStorage->getToken();
+        }
+
+        return null;
     }
 }
