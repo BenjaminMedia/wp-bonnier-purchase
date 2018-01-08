@@ -18,6 +18,14 @@ class SettingsPage
             'type' => 'text',
             'name' => 'Purchase Manager URL',
         ],
+        'subscription_url' => [
+            'type' => 'text',
+            'name' => 'Subscription Offer Highlighted URL',
+        ],
+        'site_id' => [
+            'type' => 'text',
+            'name' => 'Site Manager Site ID',
+        ],
     ];
 
     /**
@@ -179,10 +187,27 @@ class SettingsPage
 
     public function getPurchaseURL($locale = null)
     {
-        if(is_null($locale)) {
+        if(!$locale) {
             $locale = $this->get_current_locale();
         }
         return $this->get_setting_value('purchase_url', $locale) ?: '';
+    }
+
+    public function getSiteId($locale = null)
+    {
+        if(!$locale) {
+            $locale = $this->get_current_locale();
+        }
+        return $this->get_setting_value('site_id', $locale) ?: '';
+    }
+
+    public function getSubscriptionURL($locale = null)
+    {
+        if(!$locale) {
+            $locale = $this->get_current_locale();
+        }
+
+        return $this->get_setting_value('subscription_url', $locale) ?: '';
     }
 
     private function enable_language_fields()

@@ -1,9 +1,13 @@
 <?php
 
-
 namespace Bonnier\WP\Purchase;
 
-
+use Bonnier\WP\Purchase\Assets\Scripts;
+use Bonnier\WP\Purchase\Http\Ajax;
+use Bonnier\WP\Purchase\Http\Routes;
+use Bonnier\WP\Purchase\Interfaces\UserInterface;
+use Bonnier\WP\Purchase\Providers\CommonLoginUserProvider;
+use Bonnier\WP\Purchase\Repositories\PurchaseManagerRepository;
 use Bonnier\WP\Purchase\Settings\SettingsPage;
 
 class WpPurchase
@@ -28,6 +32,15 @@ class WpPurchase
 
     /** @var SettingsPage */
     private $settings;
+
+    /** @var UserInterface */
+    private $userProvider;
+
+    /** @var PurchaseManagerRepository */
+    private $serviceRepo;
+
+    /** @var Routes */
+    private $routes;
 
     public function __construct()
     {
@@ -59,5 +72,45 @@ class WpPurchase
     public function bootstrap()
     {
         $this->settings = new SettingsPage();
+        $this->userProvider = new CommonLoginUserProvider();
+        $this->serviceRepo = new PurchaseManagerRepository();
+        $this->routes = new Routes();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPluginUrl()
+    {
+        return $this->plugin_url;
+    }
+
+    /**
+     * @return SettingsPage
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
+    /**
+     * @return UserInterface
+     */
+    public function getUserProvider()
+    {
+        return $this->userProvider;
+    }
+
+    /**
+     * @return PurchaseManagerRepository
+     */
+    public function getServiceRepository()
+    {
+        return $this->serviceRepo;
+    }
+
+    public function getRoutes()
+    {
+        return $this->routes;
     }
 }
