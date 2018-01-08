@@ -19,6 +19,10 @@ class PurchaseManagerService
 
     public function hasAccess($product_id, $access_token)
     {
+        if(!$product_id || !$access_token) {
+            return false;
+        }
+
         try {
             $response = $this->client->post('has_access', [
                     'form_params' => [
@@ -39,6 +43,9 @@ class PurchaseManagerService
 
     public function getHistory($access_token)
     {
+        if(!$access_token) {
+            return null;
+        }
         try {
             $result = $this->client->get('history', [
                 'query' => [
