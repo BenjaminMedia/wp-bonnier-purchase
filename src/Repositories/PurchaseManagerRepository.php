@@ -2,6 +2,7 @@
 
 namespace Bonnier\WP\Purchase\Repositories;
 
+use Bonnier\WP\OAuth\Http\Routes;
 use Bonnier\WP\OAuth\WpOAuth;
 use Bonnier\WP\Purchase\Services\PurchaseManagerService;
 use Bonnier\WP\Purchase\WpPurchase;
@@ -30,25 +31,44 @@ class PurchaseManagerRepository
         );
     }
 
-    public function getPaymentUrl($productId, $callbackUrl = false, $paymentPreviewAttributes = [], $accessToken = false)
+    public function getPaymentUrl($productId, $callbackUrl = false, $paymentPreviewAttributes = [], $userIdentifier = false)
     {
         if(!$callbackUrl){
             $callbackUrl = $this->homeUrl;
         }
+        if(!$userIdentifier){
+            $userIdentifier = WpPurchase::instance()->getUserProvider()->getIdentifier();
+            if(!WpOAuth::instance()->getUserRepo()->isAuthenticated() || !$userIdentifier){
+                $purchaseUri = sprintf(
+                    '%s?product_id=%s&callback=%s&payment_attributes=%s',
+                    urlencode(WpPurchase::instance()->getRoutes()->getPurchaseUri()),
+                    urlencode($productId),
+                    urlencode($callbackUrl),
+                    urlencode(json_encode($paymentPreviewAttributes))
+                );
 
-        if(!$accessToken){
-            $accessToken = WpPurchase::instance()->getUserProvider()->getIdentifier();
-            if(!WpOAuth::instance()->getUserRepo()->isAuthenticated() || !$accessToken){
-                return $callbackUrl;
+                $loginUri = sprintf(
+                    '%s?redirect_uri=%s',
+                    WpOAuth::instance()->getRoutes()->getURI(Routes::LOGIN_ROUTE),
+                    urlencode($purchaseUri)
+                );
+                return $loginUri;
             }
         }
 
-        return WpPurchase::instance()->getSettings()->getPurchaseURL().
-            'has_access?access_token='.urlencode($accessToken).
-            '&product_id='.urlencode($productId).
-            '&callback='.urlencode($callbackUrl).
-            '&site_id='.WpPurchase::instance()->getSettings()->getSiteId().
-            $this->paymentPreviewParameters($paymentPreviewAttributes);
+        $settings = WpPurchase::instance()->getSettings();
+
+        $url = sprintf(
+            '%s/has_access?access_token=%s&product_id=%s&callback=%s&site_id=%s%s',
+            trim($settings->getPurchaseURL(), '/'),
+            urlencode($userIdentifier),
+            urlencode($productId),
+            urlencode($callbackUrl),
+            urlencode($settings->getSiteId()),
+            $this->paymentPreviewParameters($paymentPreviewAttributes)
+        );
+
+        return $url;
     }
 
     public function paymentPreviewParameters($paymentArticlePreviewAttributes)
@@ -68,5 +88,25 @@ class PurchaseManagerRepository
         return $this->service->getHistory(
             WpPurchase::instance()->getUserProvider()->getIdentifier()
         );
+    }
+
+    public function generateSubscriptionUrl($title, $imageUrl, $callbackUrl)
+    {
+        $subscriptionUrl = WpPurchase::instance()->getSettings()->getSubscriptionURL();
+        $parts = parse_url($subscriptionUrl);
+
+        $query = sprintf(
+            'title=%s&image=%s&returnUrl=%s&oauthClientId=%s',
+            urlencode($title),
+            urlencode($imageUrl),
+            urlencode(WpPurchase::instance()->getRoutes()->getCallbackUri() . '?redirectUri=' . $callbackUrl),
+            urlencode(WpOauth::instance()->getSettings()->get_api_user())
+        );
+
+        if (empty($parts['query'])) {
+            return $subscriptionUrl.'?'.$query;
+        } else {
+            return $subscriptionUrl.'&'.$query;
+        }
     }
 }
