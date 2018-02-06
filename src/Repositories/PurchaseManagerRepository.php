@@ -70,6 +70,24 @@ class PurchaseManagerRepository
 
         return $url;
     }
+    
+    public function getLoginPaymentUrl($productId, $callbackUrl = false, $paymentPreviewAttributes)
+    {
+        $purchaseUri = sprintf(
+            '%s?product_id=%s&callback=%s&payment_attributes=%s',
+            urlencode(WpPurchase::instance()->getRoutes()->getPurchaseUri()),
+            urlencode($productId),
+            urlencode($callbackUrl),
+            urlencode(json_encode($paymentPreviewAttributes))
+        );
+    
+        $loginUri = sprintf(
+            '%s?redirect_uri=%s',
+            WpOAuth::instance()->getRoutes()->getURI(Routes::LOGIN_ROUTE),
+            urlencode($purchaseUri)
+        );
+        return $loginUri;
+    }
 
     public function paymentPreviewParameters($paymentArticlePreviewAttributes)
     {
