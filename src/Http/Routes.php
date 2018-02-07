@@ -52,25 +52,14 @@ class Routes
         $userIdentifier = WpPurchase::instance()->getUserProvider()->getIdentifier();
 
         if(!$userIdentifier || !WpPurchase::instance()->getUserProvider()->validateIdentifier()) {
-            $purchaseUri = sprintf(
-                '%s?product_id=%s&callback=%s&payment_attributes=%s',
-                urlencode($this->getPurchaseUri()),
-                urlencode($productId),
-                urlencode($callback),
-                urlencode($paymentAttributes)
-            );
-
-            $loginUri = sprintf(
-                '%s?redirect_uri=%s',
-                WpOAuth::instance()->getRoutes()->getURI(\Bonnier\WP\OAuth\Http\Routes::LOGIN_ROUTE),
-                urlencode($purchaseUri)
-            );
-            RedirectHelper::redirect($loginUri);
+            $loginUrl = WpPurchase::instance()->getServiceRepository()->getLoginPaymentUrl($productId, $callback, $paymentAttributes);
+            RedirectHelper::redirect($loginUrl);
         }
 
         $paymentAttributes = json_decode($paymentAttributes);
 
-        RedirectHelper::redirect(WpPurchase::instance()->getServiceRepository()->getPaymentUrl($productId, $callback, $paymentAttributes, $userIdentifier));
+        $purchaseUrl = WpPurchase::instance()->getServiceRepository()->getPaymentUrl($productId, $callback, $paymentAttributes, $userIdentifier);
+        RedirectHelper::redirect($purchaseUrl);
     }
 
     public function getCallbackUri()
