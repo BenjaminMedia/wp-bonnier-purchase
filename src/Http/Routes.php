@@ -51,7 +51,7 @@ class Routes
 
         $userIdentifier = WpPurchase::instance()->getUserProvider()->getIdentifier();
 
-        if(!$userIdentifier) {
+        if(!$userIdentifier || !WpPurchase::instance()->getUserProvider()->validateIdentifier()) {
             $purchaseUri = sprintf(
                 '%s?product_id=%s&callback=%s&payment_attributes=%s',
                 urlencode($this->getPurchaseUri()),
@@ -84,14 +84,23 @@ class Routes
         );
     }
 
-    public function getPurchaseUri()
+    public function getPurchaseUri($options = [])
     {
+        $query = '';
+        if(!empty($options)) {
+            $query = '?';
+            foreach($options as $key => $value) {
+                $query .= $key . '=' . urlencode($value) . '&';
+            }
+            $query = rtrim($query, '&');
+        }
         return sprintf(
-            '%s/%s/%s/%s',
+            '%s/%s/%s/%s%s',
             trim($this->homeUrl, '/'),
             static::BASE_PREFIX,
             static::PLUGIN_PREFIX,
-            trim(static::PURCHASE_ROUTE, '/')
+            trim(static::PURCHASE_ROUTE, '/'),
+            $query
         );
     }
 }

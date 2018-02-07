@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Bonnier Purchase Plugin
- * Version: 1.0.0
+ * Version: 1.0.3
  * Plugin URI: https://github.com/BenjaminMedia/wp-bonnier-purchase
  * Description: This plugin allows you to integrate your site with a purchase service
  * Author: Bonnier
