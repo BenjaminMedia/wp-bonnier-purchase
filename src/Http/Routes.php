@@ -47,7 +47,7 @@ class Routes
     {
         $productId = $request->get_param('product_id');
         $callback = $request->get_param('callback');
-        $paymentAttributes = $request->get_param('payment_attributes');
+        $paymentAttributes = json_decode($request->get_param('payment_attributes'), true);
 
         $userIdentifier = WpPurchase::instance()->getUserProvider()->getIdentifier();
 
@@ -55,8 +55,6 @@ class Routes
             $loginUrl = WpPurchase::instance()->getServiceRepository()->getLoginPaymentUrl($productId, $callback, $paymentAttributes);
             RedirectHelper::redirect($loginUrl);
         }
-
-        $paymentAttributes = json_decode($paymentAttributes);
 
         $purchaseUrl = WpPurchase::instance()->getServiceRepository()->getPaymentUrl($productId, $callback, $paymentAttributes, $userIdentifier);
         RedirectHelper::redirect($purchaseUrl);
