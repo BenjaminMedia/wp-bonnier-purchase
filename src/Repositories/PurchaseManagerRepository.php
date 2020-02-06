@@ -83,7 +83,7 @@ class PurchaseManagerRepository
     
         $loginUri = sprintf(
             '%s?redirect_uri=%s',
-            WpOAuth::instance()->getRoutes()->getURI(Routes::LOGIN_ROUTE),
+            WpOAuth::instance()->getRoutes()->getURI(Routes::REGISTER_ROUTE),
             urlencode($purchaseUri)
         );
         return $loginUri;
